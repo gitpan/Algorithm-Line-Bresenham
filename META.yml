@@ -1,0 +1,10 @@
+--- #YAML:1.0
+name: Algorithm-Line-Bresenham
+version: 0.10
+author: ~
+abstract: simple pixellated line-drawing algorithm
+license: perl
+requires:
+  perl: 5.6.1
+provides: {}
+generated_by: Module::Build version 0.25
