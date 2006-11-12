@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 use Test::More tests => 7;
 
 BEGIN { use_ok( 'Algorithm::Line::Bresenham', qw(line) ); }

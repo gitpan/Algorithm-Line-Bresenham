@@ -1,5 +1,3 @@
-# $Id: Bresenham.pm 10 2004-09-23 21:02:32Z Administrator $
-
 =head1 NAME
 
 Algorithm::Line::Bresenham - simple pixellated line-drawing algorithm
@@ -29,9 +27,9 @@ L<http://www.gamedev.net/reference/articles/article767.asp>.
 
 package Algorithm::Line::Bresenham;
 use strict; use warnings;
-our $VERSION = do {'$Rev: 10 $'=~/(\d+)/; '0.' . $1 };
+our $VERSION = 0.11;
 use base 'Exporter';
-our @EXPORT_OK = qw/line octagon/;
+our @EXPORT_OK = qw/line circle/;
 
 =head2 C<line>
 
@@ -48,37 +46,9 @@ callback.
 
 =cut
 
-sub octagon {
-	# allegedly a circle according to Feldman's notes
-	my ($y, $x, $radius) = @_;
-	my ($curr_x, $curr_y) = (0, $radius);
-	my $d = 3 - (2 * $radius);
-	my @points;
-
-	{
-		push @points, [$y + $curr_y, $x + $curr_x];
-		push @points, [$y + $curr_y, $x - $curr_x];
-		push @points, [$y - $curr_y, $x + $curr_x];
-		push @points, [$y - $curr_y, $x - $curr_x];
-		push @points, [$y + $curr_x, $x + $curr_y];
-		push @points, [$y + $curr_x, $x - $curr_y];
-		push @points, [$y - $curr_x, $x + $curr_y];
-		push @points, [$y - $curr_x, $x - $curr_y];
-		last if $curr_x >= $curr_y;
-		if ($d < 0) {
-			$d += (4 * $curr_x) + 6;
-		} else {
-			$d += (4 * $curr_x - $curr_y) + 10;
-			$curr_y -= 1;
-		}
-		$curr_x++;
-		redo;
-	}
-	return @points;
-}
-
 sub line {
 	my ($from_y, $from_x, $to_y, $to_x, $callback) = @_;
+    $_ = int $_ for ($from_y, $from_x, $to_y, $to_x);
 	my ($delta_y, $delta_x) = ($to_y-$from_y, $to_x-$from_x);
 	my $dir = abs($delta_y) > abs($delta_x);
 	my ($curr_maj, $curr_min, $to_maj, $to_min, $delta_maj, $delta_min) = 
@@ -116,6 +86,43 @@ sub line {
 	return @points;
 }
 
+=head2 C<circle>
+
+    my @points = circle ($y, $x, $radius)
+
+Returns the points to draw a circle with
+
+=cut
+
+sub circle {
+	my ($y, $x, $radius) = @_;
+	my ($curr_x, $curr_y) = (0, $radius);
+	my $d = 3 - (2 * $radius);
+	my @points;
+
+	{
+		push @points, [$y + $curr_y, $x + $curr_x];
+		push @points, [$y + $curr_y, $x - $curr_x];
+		push @points, [$y - $curr_y, $x + $curr_x];
+		push @points, [$y - $curr_y, $x - $curr_x];
+		push @points, [$y + $curr_x, $x + $curr_y];
+		push @points, [$y + $curr_x, $x - $curr_y];
+		push @points, [$y - $curr_x, $x + $curr_y];
+		push @points, [$y - $curr_x, $x - $curr_y];
+		last if $curr_x >= $curr_y;
+		if ($d < 0) {
+			$d += (4 * $curr_x) + 6;
+		} else {
+			$d += 4 * ($curr_x - $curr_y) + 10;
+			$curr_y -= 1;
+		}
+		$curr_x++;
+		redo;
+	}
+	return @points;
+}
+
+
 sub sig {
 	# returns: +1, 0, -1 depending on sign
 	$_[0] or return 0;
@@ -128,13 +135,17 @@ __END__
 
 =head1 TODO and BUGS
 
-Implement Circle algorithm
+None currently.
+
+=head1 THANKS
+
+Patches for the circle algorithm and a float value bug contributed by Richard Clamp, thanks!
 
 =head1 AUTHOR and LICENSE
 
 osfameron, osfameron@cpan.org
 
-Copyright (c) 2004. osfameron. All rights reserved.
+Copyright (c) 2004-2006 osfameron. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
